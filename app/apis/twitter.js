@@ -52,13 +52,12 @@ let getTweets = (screenName, count) => {
         };
         resolve({tweets: tweetsArray});
       } else {
-        resolve({error: 'Could not get tweets of specified user.'});
-        //reject({error: 'Could not get tweets of specified user.'});
+        //resolve({error: 'Could not get tweets of specified user.'});
+        reject({error: 'Could not get tweets of specified user.'});
       };
     });
   });
 }
-
 
 let postSlackResponse = (responseUrl, response) => {
   let json;
