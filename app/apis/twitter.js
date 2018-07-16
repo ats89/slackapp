@@ -52,14 +52,13 @@ let getTweets = (screenName, count) => {
         };
         resolve({tweets: tweetsArray});
       } else {
-        //resolve({error: 'Could not get tweets of specified user.'});
         reject({error: 'Could not get tweets of specified user.'});
       };
     });
   });
 }
 
-let postSlackResponse = (responseUrl, response) => {
+let postSlackTweets = (responseUrl, response) => {
   let json;
 
   if (response.tweets) {
@@ -107,10 +106,9 @@ let postSlackResponse = (responseUrl, response) => {
 
   request(options, (err, resp, body) => {
     if (err) {
-      console.log('error:', err);
+      console.log('postSlackTweets() error: ', err);
     } else { 
-      console.log('statusCode:', resp && resp.statusCode);
-      console.log('body:', body); 
+      console.log('postSlackTweets() success');
     };
   });
 }
@@ -118,5 +116,5 @@ let postSlackResponse = (responseUrl, response) => {
 module.exports = {
   getTweets,
   isValidInput,
-  postSlackResponse
+  postSlackTweets
 };

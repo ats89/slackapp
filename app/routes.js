@@ -43,9 +43,9 @@ module.exports = (app) => {
       res.send(`Getting the ${count > 1 ? `last *${count}* tweets ` : 'latest tweet'} on *@${screenName}*'s timeline:`);
 
       twitter.getTweets(screenName, count).then((response) => {
-        twitter.postSlackResponse(responseUrl, response);
+        twitter.postSlackTweets(responseUrl, response);
       }).catch((error) => {
-        twitter.postSlackResponse(responseUrl, error);
+        twitter.postSlackTweets(responseUrl, error);
       });
     } else {
       res.send("Invalid `/get-tweets` command! \n(Try `/get-tweets {user} {count (1-5, optional)}`)");
@@ -68,7 +68,7 @@ module.exports = (app) => {
     slack.getUsersList(input).then((resp) => {
       slack.postSlackRandUser(response_url, resp);
     }).catch((err) => {
-      console.log(err);
+      console.log('getUsersList() error: ', err);
     });
   });
 }
