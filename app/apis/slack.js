@@ -7,6 +7,20 @@ getChannelsList: channels:read
 postSlackMsgToUser: chat:write:bot
 */
 
+let oauthAccess = (req, res) => {
+  request({
+    url: 'https://slack.com/api/oauth.access',        
+    qs: { code: req.query.code, client_id: process.env.SLACK_CLIENT_ID, client_secret: process.env.SLACK_CLIENT_SECRET },
+    method: 'GET',
+  }, (err, resp, body) => {
+    if (err) {
+      console.log('oauthAccess() error: ', err);
+    } else {
+      res.json(body);
+    };
+  });
+};
+
 let getUsersList = (input) => {
   const options = {
     url: 'https://slack.com/api/users.list',
@@ -125,6 +139,7 @@ let postSlackMsgToUser = (userId, channelId) => {
 } 
 
 module.exports = {
+  oauthAccess,
   getUsersList,
   postSlackRandUser
 }

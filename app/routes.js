@@ -1,4 +1,3 @@
-const request = require('request');
 const twitter = require('./apis/twitter');
 const slack = require('./apis/slack');
 
@@ -15,19 +14,9 @@ module.exports = (app) => {
     if(!req.query.code) {
       res.status(500);
       res.send({ 'Error': 'Not getting query code.' });
-      console.log('Not getting code');
+      console.log('Not getting code.');
     } else {
-      request({
-        url: 'https://slack.com/api/oauth.access',        
-        qs: { code: req.query.code, client_id: process.env.SLACK_CLIENT_ID, client_secret: process.env.SLACK_CLIENT_SECRET },
-        method: 'GET',
-      }, (err, resp, body) => {
-        if (err) {
-          console.log('error:', err);
-        } else {
-          res.json(body);
-        };
-      })
+      oAuthAccess(req, res);
     };
   });
 
