@@ -1,4 +1,74 @@
 const request = require('request');
+const twitter = require('./apis/twitter');
+
+let postResponse = (responseUrl, response) => {
+  let json;
+
+  if (response.tweets) {
+    let attachments = [];
+
+    for (let tweet of response.tweets) {
+      let jsonTweet = {
+        "fallback": "tweet",
+        "author_name": tweet.user,
+        "author_icon": tweet.userProfileImgUrl,
+        "text": tweet.text,
+        "fields": [
+          {
+            "title": "Retweets",
+            "value": tweet.retweetCount,
+            "short": true
+          }, 
+          {
+            "title": "Likes",
+            "value": tweet.favoriteCount,
+            "short": true
+          }	
+        ]
+      };
+      attachments.push(jsonTweet);
+    };
+
+    json = {
+      "response_type": "in_channel", 
+      "attachments": attachments, 
+    };
+  } else {
+    json = { 
+      "response_type": "in_channel", 
+      "text": response.error, 
+    };
+  };
+
+  const options = {
+    url: responseUrl, // webhook url supplied by slack request
+    method: 'POST',
+    json: json
+  };
+
+  request(options, (err, resp, body) => {
+    console.log('error:', err); // Print the error if one occurred
+    console.log('statusCode:', resp && resp.statusCode); // Print the response status code if a response was received
+    console.log('body:', body); 
+  });
+}
+
+//function post_response(response_url) {
+
+//   //   const oauthAccessToken = process.env.SLACK_OAUTH_TOKEN;
+//   //   const optionsAA = {
+//   //     url: 'https://slack.com/api/users.list',
+//   //     headers: {
+//   //       'Authorization': `Bearer ${oauthAccessToken}`
+//   //     }
+//   //   };
+
+//   //   request(optionsAA, function (error, response, body) {
+//   //     console.log('error:', error); // Print the error if one occurred
+//   //     console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+//   //     console.log('body:', body); // Print the HTML for the Google homepage.
+//   //   });
+
 
 module.exports = (app) => {
 
@@ -29,12 +99,32 @@ module.exports = (app) => {
     };
   });
 
-  // Slash command endpoint (Slack sends a POST req)
+  // Slash command '/get-tweets'
+  app.post('/get-tweets', (req, res) => {
+    const input = req.body.text;
+    const responseUrl = req.body.response_url;
+
+    if (twitter.isValidInput(input)) {
+      const screenName = input.split(' ')[0];
+      const count = input.split(' ')[1] || 1;
+
+      res.send(`Getting the ${count > 1 ? `last *${count}* tweets ` : 'latest tweet'} on *@${screenName}*'s timeline:`);
+
+      twitter.getTweets(screenName, count).then((response) => {
+        postResponse(responseUrl, response);
+      });
+    } else {
+      res.send("Invalid `/get-tweets` command! \n(Try `/get-tweets {user} {count (1-5, optional)}`)");
+    };
+  });
+
+  // Slash command '/woof' endpoint (Slack sends a POST req)
   app.post('/woof', (req, res) => {
     // console.log(req.headers);
     // console.log(req.body);
     const response_url = req.body.response_url;
     console.log(response_url);
+   
 
     // res.setHeader('Content-Type', 'application/json');
     res.send('hello world!');
@@ -42,22 +132,6 @@ module.exports = (app) => {
     //setTimeout(function () { post_response(response_url) }, 3500);
   });
 
-
-  // function post_response(response_url) {
-
-  //   const oauthAccessToken = process.env.SLACK_OAUTH_TOKEN;
-  //   const optionsAA = {
-  //     url: 'https://slack.com/api/users.list',
-  //     headers: {
-  //       'Authorization': `Bearer ${oauthAccessToken}`
-  //     }
-  //   };
-
-  //   request(optionsAA, function (error, response, body) {
-  //     console.log('error:', error); // Print the error if one occurred
-  //     console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-  //     console.log('body:', body); // Print the HTML for the Google homepage.
-  //   });
 
 
   
