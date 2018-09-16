@@ -66,7 +66,7 @@ module.exports = (app) => {
       {
         "fallback": "git help 1",
         "color": "#de3C4b",
-        "text": "```git status # view state of repo\ngit add <some_file> # stage a file\ngit add . / git add -A # add all changed files to staging area\ngit commit -m “...”```",
+        "text": "```git status # view state of repo\ngit add <some_file> # stage a file\ngit add . / git add -A # add all changed files to staging area\ngit commit -m “...”\ngit stash #saves local commits and reverts working directory\n git stash apply #restores saved commits and applies them to current branch```",
         "mrkdwn_in": ["text"]
       },
       {
